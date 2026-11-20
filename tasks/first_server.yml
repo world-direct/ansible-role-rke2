@@ -179,13 +179,15 @@
           {{ names }}
       run_once: true
 
+    # Also for nodes still in the inventory: a rebuilt node with the same name has a new
+    # /etc/rancher/node/password and would be rejected. RKE2 recreates the secret on join.
     - name: Remove old <node>.node-password.rke2 secrets
       ansible.builtin.shell: |
         {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
         delete secret {{ item }}.node-password.rke2 -n kube-system 2>&1 || true
       args:
         executable: /bin/bash
-      with_items: "{{ registered_node_names.stdout_lines | difference(node_names) }}"
+      with_items: "{{ registered_node_names.stdout_lines | union(node_names) }}"
       changed_when: true
       when:
         - item != rke2_node_name
