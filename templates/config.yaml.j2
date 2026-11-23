@@ -8,7 +8,7 @@ server: https://{{ rke2_api_ip | ansible.utils.ipwrap }}:9345
 {% if rke2_bind_address is defined %}
 bind-address: {{ rke2_bind_address }}
 {% endif %}
-{% if rke2_agent_token is defined %}
+{% if rke2_agent_token is defined and inventory_hostname in groups[rke2_servers_group_name] %}
 agent-token: {{ rke2_agent_token }}
 {% endif %}
 token: {{ rke2_token }}
